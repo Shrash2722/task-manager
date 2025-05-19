@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../app');
 
-describe('POST /tasks',(){
+describe('task routes',() => {
     it('Should create new task and return 201',async () =>{
         const res = await request(app)
         .post('/tasks')
@@ -26,4 +26,33 @@ describe('POST /tasks',(){
         expect(res.statusCode).toBe(400);
         expect(res.body).toHaveProperty('error');
     });
+
+    it('Should fetch all task',async() => {
+        const res = await request(app)
+        .get('/tasks');
+
+        expect(res.statusCode).toBe(200);
+        expect(Array.isArray(res.body)).toBe(true);
+    });
+
+    it('Should Fetch a task by ID', async () =>{
+        const create = await request(app)
+        .post('/tasks')
+        .send({title:'Get Task',description:'Fetch'});
+        
+        const res = await request(app)
+        .get(`/tasks/${create.body.id}`);
+        expect(res.statusCode).toBe(200);
+    });
+
+    it('Should Delete a task by ID', async () => {
+        const create = await request(app)
+        .post('/tasks')
+        .send({title:'To Delete',description:'Delete'});
+
+        const del = await request(app).delete(`/tasks/${create.body.id}`);
+        expect(del.statusCode).toBe(200);
+    });
+
+    
 });
